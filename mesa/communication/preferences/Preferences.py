@@ -16,33 +16,39 @@ class Preferences:
     """
 
     def __init__(self):
-        """Creates a new Preferences object.
+        """
+        Creates a new Preferences object.
         """
         self.__criterion_name_list = []
         self.__criterion_value_list = []
 
     def get_criterion_name_list(self):
-        """Returns the list of criterion name.
+        """
+        Returns the list of criterion name.
         """
         return self.__criterion_name_list
 
     def get_criterion_value_list(self):
-        """Returns the list of criterion value.
+        """
+        Returns the list of criterion value.
         """
         return self.__criterion_value_list
 
     def set_criterion_name_list(self, criterion_name_list):
-        """Sets the list of criterion name.
+        """
+        Sets the list of criterion name.
         """
         self.__criterion_name_list = criterion_name_list
 
     def add_criterion_value(self, criterion_value):
-        """Adds a criterion value in the list.
+        """
+        Adds a criterion value in the list.
         """
         self.__criterion_value_list.append(criterion_value)
 
     def get_value(self, item, criterion_name):
-        """Gets the value for a given item and a given criterion name.
+        """
+        Gets the value for a given item and a given criterion name.
         """
         for value in self.__criterion_value_list:
             if value.get_item() == item and value.get_criterion_name() == criterion_name:
@@ -50,7 +56,8 @@ class Preferences:
         return None
 
     def is_preferred_criterion(self, criterion_name_1, criterion_name_2):
-        """Returns if a criterion 1 is preferred to the criterion 2.
+        """
+        Returns if a criterion 1 is preferred to the criterion 2.
         """
         for criterion_name in self.__criterion_name_list:
             if criterion_name == criterion_name_1:
@@ -59,14 +66,19 @@ class Preferences:
                 return False
 
     def is_preferred_item(self, item_1, item_2):
-        """Returns if the item 1 is preferred to the item 2.
+        """
+        Returns if the item 1 is preferred to the item 2.
         """
         return item_1.get_score(self) > item_2.get_score(self)
 
     def most_preferred(self, item_list):
-        """Returns the most preferred item from a list.
         """
-        # To be completed
+        Returns the most preferred item from a list.
+        """
+        best_item = item_list[0]
+        for item in item_list[1:]:
+            if self.is_preferred_item(item, best_item):
+                best_item = item
         return best_item
 
     def is_item_among_top_10_percent(self, item, item_list):
@@ -75,12 +87,18 @@ class Preferences:
 
         :return: a boolean, True means that the item is among the favourite ones
         """
-        # To be completed
-        return is_top_item
+        nb_items = len(item_list)
+        nb_is_preferred = 0
+        for other_item in item_list[1:]:
+            if self.is_preferred_item(item, other_item):
+                nb_is_preferred += 1
+
+        return (nb_is_preferred / nb_items) >= 0.9
 
 
 if __name__ == '__main__':
-    """Testing the Preferences class.
+    """
+    Testing the Preferences class.
     """
     agent_pref = Preferences()
     agent_pref.set_criterion_name_list([CriterionName.PRODUCTION_COST, CriterionName.ENVIRONMENT_IMPACT,
