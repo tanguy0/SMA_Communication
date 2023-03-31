@@ -45,7 +45,8 @@ class Mailbox:
         return self.__read_messages
 
     def get_messages_from_performative(self, performative):
-        """ Return a list of messages which have the same performative.
+        """ 
+        Return a list of messages which have the same performative.
         """
         messages_from_performative = []
         for message in self.__unread_messages + self.__read_messages:

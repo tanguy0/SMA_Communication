@@ -4,7 +4,8 @@ from enum import Enum
 
 
 class Value(Enum):
-    """Value enum class.
+    """
+    Value enum class.
     Enumeration containing the possible Value.
     """
     VERY_BAD = 0

@@ -2,7 +2,8 @@
 
 
 class Message:
-    """Message class.
+    """
+    Message class.
     Class implementing the message object which is exchanged between agents through a message service
     during communication.
 

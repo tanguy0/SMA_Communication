@@ -69,7 +69,7 @@ class Preferences:
         """
         Returns if the item 1 is preferred to the item 2.
         """
-        return item_1.get_score(self) > item_2.get_score(self)
+        return item_1.get_score(self) >= item_2.get_score(self)
 
     def most_preferred(self, item_list):
         """
@@ -84,16 +84,14 @@ class Preferences:
     def is_item_among_top_10_percent(self, item, item_list):
         """
         Return whether a given item is among the top 10 percent of the preferred items.
-
-        :return: a boolean, True means that the item is among the favourite ones
         """
         nb_items = len(item_list)
         nb_is_preferred = 0
-        for other_item in item_list[1:]:
+        for other_item in item_list:
             if self.is_preferred_item(item, other_item):
                 nb_is_preferred += 1
 
-        return (nb_is_preferred / nb_items) >= 0.9
+        return (nb_is_preferred / nb_items) > 0.9
 
 
 if __name__ == '__main__':
