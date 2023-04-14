@@ -26,27 +26,25 @@ class ArgumentAgent(CommunicatingAgent):
         new_messages = set(self.get_new_messages())
 
         if new_messages:
-            new_ask_why = new_messages.intersection(
-                set(self.get_messages_from_performative(MessagePerformative.ASK_WHY)))
-            if new_ask_why:
-                for mess in new_ask_why:
-                    self.send_specific_message(mess, MessagePerformative.ARGUE)
 
-            # If the agent receives a COMMIT
-            new_commit = new_messages.intersection(
-                set(self.get_messages_from_performative(MessagePerformative.COMMIT)))
-            if new_commit:
-                for mess in new_commit:
-                    item = mess.get_content()
-                    if item in self.get_preference_dict().keys():
-                        self.send_specific_message(
-                            mess, MessagePerformative.COMMIT)
-                        self.remove_item(item)
-                    # print(self.get_preference_dict())
+            # If the agent receives a PROPOSE
+            new_propose = new_messages.intersection(
+                set(self.get_messages_from_performative(MessagePerformative.PROPOSE))
+                )
+            if new_propose:
+                for mess in new_propose:
+                    is_in_preferred = self.get_preference().is_item_among_top_10_percent(
+                        mess.get_content(), list(self.get_preference_dict().keys())
+                        )
+                    if is_in_preferred:
+                        self.send_specific_message(mess, MessagePerformative.ACCEPT)
+                    else:
+                        self.send_specific_message(mess, MessagePerformative.ASK_WHY)
 
             # If the agent receives an ACCEPT
             new_accept = new_messages.intersection(
-                set(self.get_messages_from_performative(MessagePerformative.ACCEPT)))
+                set(self.get_messages_from_performative(MessagePerformative.ACCEPT))
+                )
             if new_accept:
                 for mess in new_accept:
                     item = mess.get_content()
@@ -54,20 +52,26 @@ class ArgumentAgent(CommunicatingAgent):
                         self.send_specific_message(
                             mess, MessagePerformative.COMMIT)
                         self.remove_item(item)
+                        
+            # If the message is a ASK_WHY
+            new_ask_why = new_messages.intersection(
+                set(self.get_messages_from_performative(MessagePerformative.ASK_WHY))
+                )
+            if new_ask_why:
+                for mess in new_ask_why:
+                    self.send_specific_message(mess, MessagePerformative.ARGUE)
 
-            # If the agent receives a PROPOSE
-            new_propose = new_messages.intersection(set(self.get_messages_from_performative(
-                MessagePerformative.PROPOSE)))
-            if new_propose:
-                for mess in new_propose:
-                    is_in_10 = self.get_preference().is_item_among_top_10_percent(
-                        mess.get_content(), list(self.get_preference_dict().keys()))
-                    if is_in_10:
+            # If the agent receives a COMMIT
+            new_commit = new_messages.intersection(
+                set(self.get_messages_from_performative(MessagePerformative.COMMIT))
+                )
+            if new_commit:
+                for mess in new_commit:
+                    item = mess.get_content()
+                    if item in self.get_preference_dict().keys():
                         self.send_specific_message(
-                            mess, MessagePerformative.ACCEPT)
-                    else:
-                        self.send_specific_message(
-                            mess, MessagePerformative.ASK_WHY)
+                            mess, MessagePerformative.COMMIT)
+                        self.remove_item(item)
 
     def get_preference(self):
         return self.preference
@@ -108,7 +112,8 @@ class ArgumentAgent(CommunicatingAgent):
 
 
 class ArgumentModel (Model):
-    """ ArgumentModel which inherit from Model .
+    """ 
+    ArgumentModel which inherit from Model .
     """
 
     def __init__(self, n_agent, preferences):
@@ -190,8 +195,6 @@ def run_argumentation():
 
     # Launch the Communication
     message = Message("A0", "A1", MessagePerformative.PROPOSE, electric_engine)
-    #message = Message("A0", "A1", MessagePerformative.PROPOSE, diesel_engine)
-    #message = Message("A0", "A1", MessagePerformative.PROPOSE, electric_engine)
     #message = Message("A0", "A1", MessagePerformative.PROPOSE, diesel_engine)
     print(message.__str__())
     Buyer.send_message(message)
