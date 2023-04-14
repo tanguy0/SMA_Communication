@@ -4,7 +4,8 @@ from enum import Enum
 
 
 class MessagePerformative(Enum):
-    """MessagePerformative enum class.
+    """
+    MessagePerformative enum class.
     Enumeration containing the possible message performative.
     """
     PROPOSE = 101
