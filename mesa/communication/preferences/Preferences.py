@@ -92,6 +92,14 @@ class Preferences:
                 nb_is_preferred += 1
 
         return (nb_is_preferred / nb_items) > 0.9
+    
+    def remove_item(self, item):
+        for value in self.get_criterion_value_list():
+            if value.get_item() == item:
+                self.remove_value(value)
+                
+    def remove_value(self, value):
+        self.__criterion_value_list.remove(value)
 
 
 if __name__ == '__main__':
