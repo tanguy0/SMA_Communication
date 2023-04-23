@@ -194,8 +194,8 @@ def run_argumentation():
     Seller = argument_model.agents[1]
 
     # Launch the Communication
-    message = Message("A0", "A1", MessagePerformative.PROPOSE, electric_engine)
-    #message = Message("A0", "A1", MessagePerformative.PROPOSE, diesel_engine)
+    #message = Message("A0", "A1", MessagePerformative.PROPOSE, electric_engine)
+    message = Message("A0", "A1", MessagePerformative.PROPOSE, diesel_engine)
     print(message.__str__())
     Buyer.send_message(message)
 
