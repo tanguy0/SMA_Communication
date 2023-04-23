@@ -25,8 +25,7 @@ class Message:
     def __str__(self):
         """ Return Message as a String.
         """
-        return "From " + str(self.__from_agent) + " to " + str(self.__to_agent) \
-               + " (" + str(self.__message_performative) + ") " + str(self.__content)
+        return str(self.get_exp()) + " to " + str(self.get_dest()) + " - " + str(self.__message_performative) + "(" + str(self.__content) + ")"
 
     def get_exp(self):
         """ Return the sender of the message.

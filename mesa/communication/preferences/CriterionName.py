@@ -12,3 +12,6 @@ class CriterionName(Enum):
     DURABILITY = 2
     ENVIRONMENT_IMPACT = 3
     NOISE = 4
+    
+    def __str__(self):
+        return self.name

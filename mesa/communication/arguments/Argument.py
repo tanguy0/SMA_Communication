@@ -3,7 +3,7 @@
 from communication.arguments.Comparison import Comparison
 from communication.arguments.CoupleValue import CoupleValue
 from communication.preferences.Value import Value
-
+from communication.preferences.Preferences import Preferences
 
 class Argument:
     """
@@ -25,6 +25,25 @@ class Argument:
         self.__item = item.get_name()
         self.__comparison_list = []
         self.__couple_values_list = []
+        self.__counter_arguments = [] #ADD
+        
+    #ADD
+    def __str__(self):
+        res = self.item.__str__() + " <- "
+        first = True
+        for arg in self.get_comparison_list() + self.get_couple_values_list():
+            if first:
+                first = False
+            else:
+                res += ", "
+            res += arg.__str__()
+        return res
+    
+    def get_comparison_list(self):
+        return(self.comparison_list)
+
+    def get_couple_values_list(self):
+        return(self.couple_values_list)
 
     def add_premiss_comparison(self, criterion_name_1, criterion_name_2):
         """
@@ -63,3 +82,18 @@ class Argument:
             if value in bad_enough_values:
                 premisses.append(criteria)
         return premisses
+    
+    def add_counter_argument(self, counter_arg):
+        self.counter_arguments.append(counter_arg)
+
+    def get_counter_arguments(self):
+        return self.counter_arguments
+
+    def get_item(self):
+        return self.item
+
+    def get_decision(self):
+        return self.decision
+
+    def get_premisces(self):
+        return self.get_comparison_list() + self.get_couple_values_list()

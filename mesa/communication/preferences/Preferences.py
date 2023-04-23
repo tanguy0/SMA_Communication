@@ -21,6 +21,13 @@ class Preferences:
         """
         self.__criterion_name_list = []
         self.__criterion_value_list = []
+        self.__criterion_order_preference = []
+        
+    def set_criterion_order_preference(self, criterion_order_preference):
+        self.__criterion_order_preference = criterion_order_preference
+        
+    def get_criterion_order_preference(self):
+        return self.__criterion_order_preference
 
     def get_criterion_name_list(self):
         """
@@ -75,8 +82,10 @@ class Preferences:
         """
         Returns the most preferred item from a list.
         """
-        best_item = item_list[0]
-        for item in item_list[1:]:
+        print("type item_list :",type(item_list))
+        list_item_list = list(item_list)
+        best_item = list_item_list[0]
+        for item in list_item_list[1:]:
             if self.is_preferred_item(item, best_item):
                 best_item = item
         return best_item
@@ -100,6 +109,9 @@ class Preferences:
                 
     def remove_value(self, value):
         self.__criterion_value_list.remove(value)
+        
+    def set_criterion_order_preference(self, criterion_order_preference):
+        self.__criterion_order_preference = criterion_order_preference
 
 
 if __name__ == '__main__':

@@ -9,6 +9,7 @@ from communication.preferences.Preferences import Preferences
 from communication.preferences.CriterionName import CriterionName
 from communication.preferences.CriterionValue import CriterionValue
 from communication.preferences.Value import Value
+from communication.arguments.Argument import Argument
 
 import random
 
@@ -188,6 +189,7 @@ def run_argumentation():
 
     # Initialize the model
     argument_model = ArgumentModel(2, [agent_0_preferences, agent_1_preferences])
+    print("AGENT FROM MODEL : ",argument_model.agents)
 
     # Retrieve agents
     Buyer = argument_model.agents[0]
