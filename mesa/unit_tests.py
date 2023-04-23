@@ -16,28 +16,25 @@ if __name__ == "__main__":
     """
     Function to run a specific argumentation protocole.
     """
-    # Init model and agents
-    argument_model = ArgumentModel()
-
-    # Objects
+    # Initialize objects
     diesel_engine = Item("Diesel Engine", "A super cool diesel engine")
     electric_engine = Item("Electric Engine", "A very quiet engine")
 
-    # Create preference system for A1
-    A1 = {
+    # Set agent preferences
+    agent_0_preferences = {
         diesel_engine: {
-            CriterionName.PRODUCTION_COST: Value.VERY_GOOD,
-            CriterionName.ENVIRONMENT_IMPACT: Value.VERY_BAD,
-            CriterionName.CONSUMPTION: Value.GOOD,
-            CriterionName.DURABILITY: Value.VERY_GOOD,
-            CriterionName.NOISE: Value.BAD,
+        CriterionName.PRODUCTION_COST: Value.VERY_GOOD,
+        CriterionName.ENVIRONMENT_IMPACT: Value.VERY_BAD,
+        CriterionName.CONSUMPTION: Value.GOOD,
+        CriterionName.DURABILITY: Value.VERY_GOOD,
+        CriterionName.NOISE: Value.BAD
         },
         electric_engine: {
-            CriterionName.PRODUCTION_COST: Value.BAD,
-            CriterionName.ENVIRONMENT_IMPACT: Value.VERY_GOOD,
-            CriterionName.CONSUMPTION: Value.VERY_BAD,
-            CriterionName.DURABILITY: Value.GOOD,
-            CriterionName.NOISE: Value.VERY_GOOD,
+        CriterionName.PRODUCTION_COST: Value.BAD,
+        CriterionName.ENVIRONMENT_IMPACT: Value.VERY_GOOD,
+        CriterionName.CONSUMPTION: Value.VERY_BAD,
+        CriterionName.DURABILITY: Value.GOOD,
+        CriterionName.NOISE: Value.VERY_GOOD
         },
         "crit_order": [
             CriterionName.PRODUCTION_COST,
@@ -47,22 +44,21 @@ if __name__ == "__main__":
             CriterionName.NOISE,
         ],
     }
-
-    # System preference for A2
-    A2 = {
+        
+    agent_1_preferences = {
         diesel_engine: {
-            CriterionName.PRODUCTION_COST: Value.GOOD,
-            CriterionName.ENVIRONMENT_IMPACT: Value.BAD,
-            CriterionName.CONSUMPTION: Value.GOOD,
-            CriterionName.DURABILITY: Value.VERY_BAD,
-            CriterionName.NOISE: Value.VERY_BAD,
+        CriterionName.PRODUCTION_COST: Value.GOOD,
+        CriterionName.ENVIRONMENT_IMPACT: Value.BAD,
+        CriterionName.CONSUMPTION: Value.GOOD,
+        CriterionName.DURABILITY: Value.VERY_BAD,
+        CriterionName.NOISE: Value.VERY_BAD
         },
         electric_engine: {
-            CriterionName.PRODUCTION_COST: Value.GOOD,
-            CriterionName.ENVIRONMENT_IMPACT: Value.BAD,
-            CriterionName.CONSUMPTION: Value.BAD,
-            CriterionName.DURABILITY: Value.VERY_GOOD,
-            CriterionName.NOISE: Value.VERY_GOOD,
+        CriterionName.PRODUCTION_COST: Value.GOOD,
+        CriterionName.ENVIRONMENT_IMPACT: Value.BAD,
+        CriterionName.CONSUMPTION: Value.BAD,
+        CriterionName.DURABILITY: Value.VERY_GOOD,
+        CriterionName.NOISE: Value.VERY_GOOD
         },
         "crit_order": [
             CriterionName.ENVIRONMENT_IMPACT,
@@ -71,11 +67,15 @@ if __name__ == "__main__":
             CriterionName.CONSUMPTION,
             CriterionName.DURABILITY,
         ],
-    }
+        }
 
-    # Create the Buyer and the seller
-    Buyer = ArgumentAgent(1, argument_model, "Buyer", preferences =A1)
-    Seller = ArgumentAgent(2, argument_model, "Seller", preferences =A2)
+    # Initialize the model
+    argument_model = ArgumentModel(2, [agent_0_preferences, agent_1_preferences])
+
+    # Retrieve agents
+    Buyer = argument_model.agents[0]
+    Seller = argument_model.agents[1]
+    
     message = Message(
         Seller.get_name(),
         Buyer.get_name(),
@@ -106,7 +106,6 @@ if __name__ == "__main__":
     print("*---- Testing preference package ----")
     print("*")
     print("* 3) Testing Most Preferred")
-    print("Buyer.get_preference : ",Buyer.get_preference())
     assert len(Buyer.get_item_list()) == 2
     assert Buyer.get_preference().most_preferred(Buyer.get_item_list()) is not None
     assert Buyer.get_preference().most_preferred(Buyer.get_item_list()) == diesel_engine
@@ -123,7 +122,6 @@ if __name__ == "__main__":
 
     print("* 5) Testing Agents and messages")
     assert type(Buyer.get_preference()) == Preferences
-    print("len buyer cirt name list : ",list(Buyer.get_preference().get_criterion_name_list()))
     assert len(list(Buyer.get_preference().get_criterion_name_list())) == 5
 
     assert list(Buyer.get_preference().get_criterion_order_preference()) == [
@@ -134,7 +132,7 @@ if __name__ == "__main__":
         CriterionName.NOISE
     ]
     print("La fonction get_preference fonctionne")
-    assert Buyer.get_preference_dict() == A1
+    assert Buyer.get_preference_dict() == agent_0_preferences
     print("La fonction get_preference_dict fonctionne")
     assert type(Buyer.get_model()) == ArgumentModel
     print("La fonction get_model fonctionne")

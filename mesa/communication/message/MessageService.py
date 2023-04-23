@@ -46,8 +46,6 @@ class MessageService:
     def dispatch_message(self, message):
         """ Dispatch the message to the right agent.
         """
-        print("destinataire : ", message.get_dest())
-        print("find agent : ",self.find_agent_from_name(message.get_dest()))
         self.find_agent_from_name(message.get_dest()).receive_message(message)
 
     def dispatch_messages(self):
@@ -62,8 +60,6 @@ class MessageService:
     def find_agent_from_name(self, agent_name):
         """ Return the agent according to the agent name given.
         """
-        print("all agents :",self.__scheduler.agents)
         for agent in self.__scheduler.agents:
-            print("agent : ",agent)
             if agent.get_name() == agent_name:
                 return agent
