@@ -10,7 +10,7 @@ from communication.preferences.CriterionName import CriterionName
 from communication.preferences.CriterionValue import CriterionValue
 from communication.preferences.Value import Value
 from communication.arguments.Argument import Argument
-from pw_argumentation_bis import ArgumentModel, ArgumentAgent
+from pw_argumentation_new import ArgumentModel, ArgumentAgent
 
 if __name__ == "__main__":
     """

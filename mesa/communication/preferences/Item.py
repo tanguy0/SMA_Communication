@@ -11,33 +11,39 @@ class Item:
      """
 
     def __init__(self, name, description):
-        """Creates a new Item.
+        """
+        Creates a new Item.
         """
         self.__name = name
         self.__description = description
 
     def __str__(self):
-        """Returns Item as a String.
+        """
+        Returns Item as a String.
         """
         return self.__name + " (" + self.__description + ")"
 
     def get_name(self):
-        """Returns the name of the item.
+        """
+        Returns the name of the item.
         """
         return self.__name
 
     def get_description(self):
-        """Returns the description of the item.
+        """
+        Returns the description of the item.
         """
         return self.__description
 
     def get_value(self, preferences, criterion_name):
-        """Returns the Value of the Item according to agent preferences.
+        """
+        Returns the Value of the Item according to agent preferences.
         """
         return preferences.get_value(self, criterion_name)
 
     def get_score(self, preferences):
-        """Returns the score of the Item according to agent preferences.
+        """
+        Returns the score of the Item according to agent preferences.
         """
         criterion_weight = 100
         sum_result = 0
