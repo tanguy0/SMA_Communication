@@ -106,4 +106,3 @@ if __name__ == "__main__":
     assert(len(agent0.get_messages()) == 2)
     assert(len(agent1.get_messages()) == 4)
     print("*     send_message() & dispatch_messages => OK")
-
