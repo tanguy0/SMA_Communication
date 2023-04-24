@@ -16,7 +16,7 @@ import random
 
 class ArgumentAgent(CommunicatingAgent):
     """ 
-    ArgumentAgent which inherit from CommunicatingAgent .
+    ArgumentAgent which inherit from CommunicatingAgent.
     """
     def __init__(self, unique_id, model, name, preferences):
         super().__init__(unique_id, model, name)
@@ -25,68 +25,31 @@ class ArgumentAgent(CommunicatingAgent):
         self.preference_dict = preferences
         
     def get_preference(self):
-        """ "
-        input: None
-        output: Preference data with structure:
-                        {item1:{crit1:value1,
-                                crit2:val2...},
-                        item2: ...,
-                        "crit_order": [c1, ci, ]}
-                        where the agents preferes c1 > ci ...
-        """
         return self.preference
 
     def get_preference_dict(self):
-        """
-        input: None
-        output: dict object
-        """
         return self.preference_dict
 
     def get_model(self):
-        """
-        input: None
-        Ouptut: ArgumentObject object
-        """
         return self.model
     
     def get_item_list(self):
-        """
-        input: None
-        Output: list object, all the items know to the agent
-        """
         item_list = self.get_preference_dict().keys()
         return item_list
 
     def get_criteria_from_name(self, criteria_name):
-        """
-        input:
-            criteria_name: string object, name of a criteria (eg: PRODUCTION_COST)
-        output: CriterionName object, corresponding to criteria_name
-        """
         for crit in CriterionName:
             if crit.__str__() == criteria_name:
                 return crit
 
     def get_value_from_name(self, value_name):
-        """
-        input:
-            value_name: string object, name of a value (eg: VERY_BAD)
-        output: Value object, corresponding to value_name
-        """
         for val in Value:
             for val in Value:
                 if val.__str__() == value_name:
                     return val
 
     def get_item_from_name(self, item_name):
-        """
-        input:
-            item_name: string object, name of an item (eg: "DIESEL ENGINE")
-        output: Item object, corresponding to item_name
-        """
         for item in self.get_preference_dict().keys():
-            
             if item_name.__str__() == item.__str__():
                 return item
 
@@ -96,20 +59,72 @@ class ArgumentAgent(CommunicatingAgent):
         print(f"NEW_MESSAGES : {new_messages_list}")
 
         if new_messages:
-            # ARGUE MESSAGE RECEIVED
+            # If the agent receives a PROPOSE
+            new_propose = new_messages.intersection(
+                set(self.get_messages_from_performative(MessagePerformative.PROPOSE))
+            )
+            if new_propose:
+                for mess in new_propose:
+                    is_in_10 = self.get_preference().is_item_among_top_10_percent(
+                        mess.get_content(), list(self.get_preference_dict().keys())
+                    )
+                    # accept if in the 10% preferred
+                    if is_in_10:
+                        self.send_specific_message(mess, MessagePerformative.ACCEPT)
+                    else:
+                        self.send_specific_message(mess, MessagePerformative.ASK_WHY)            
+
+            # If the agent receives a ACCEPT
+            new_accept = new_messages.intersection(
+                set(self.get_messages_from_performative(MessagePerformative.ACCEPT))
+            )
+            if new_accept:
+                for mess in new_accept:
+                    item = mess.get_content()
+                    if (
+                        self.get_item_from_name(item)
+                        in self.get_preference_dict().keys()
+                    ):
+                        self.send_specific_message(mess, MessagePerformative.COMMIT)
+                        # current agent sends the item
+                        self.remove_item(self.get_item_from_name(item))
+
+            # If the agent receives a ASK WY
+            new_ask_why = new_messages.intersection(
+                set(self.get_messages_from_performative(MessagePerformative.ASK_WHY))
+            )
+            if new_ask_why:
+                for mess in new_ask_why:
+                    # when its the first argue for a specific item
+                    self.send_specific_message(mess, MessagePerformative.ARGUE)
+
+            # If the agent receives a COMMIT
+            new_commit = new_messages.intersection(
+                set(self.get_messages_from_performative(MessagePerformative.COMMIT))
+            )
+            if new_commit:
+                for mess in new_commit:
+                    item = mess.get_content()
+                    if (
+                        self.get_item_from_name(item)
+                        in self.get_preference_dict().keys()
+                    ):
+                        self.send_specific_message(mess, MessagePerformative.COMMIT)
+                        # current agent received the item
+                        self.remove_item(self.get_item_from_name(item))
+
+            # If the agent receives a ARGUE
             new_argue = new_messages.intersection(
                 set(self.get_messages_from_performative(MessagePerformative.ARGUE))
             )
             if new_argue:
                 for mess in new_argue:
                     other_agent = mess.get_exp()
-                    # argument_parsing function gets a previous message and retrieves the item in negociation
-                    # and the arguments used in favor or against the discussed item
+                    # get item and argument from previous message
                     item, previous_premise, rebutal = self.argument_parsing(
                         mess.get_content()
                     )
-                    # update_argument builds the defense or the attack of the discussed item, wrt the previous
-                    # one being a rebutal or not
+                    # build counter-argument (defense or attack)
                     new_premise, conclusion = self.update_argument(
                         item, previous_premise, other_agent, rebutal
                     )
@@ -125,72 +140,16 @@ class ArgumentAgent(CommunicatingAgent):
                             premise=new_premise,
                         )
 
-            # ASK WY MESSAGE RECEIVED
-            new_ask_why = new_messages.intersection(
-                set(self.get_messages_from_performative(MessagePerformative.ASK_WHY))
-            )
-            if new_ask_why:
-                for mess in new_ask_why:
-                    # send_specific_message in the "ARGUE" case (when its the first argue for a specific item)
-                    # also build the first argument through support_proposal
-                    self.send_specific_message(mess, MessagePerformative.ARGUE)
-
-            # COMMIT MESSAGE RECEIVED
-            new_commit = new_messages.intersection(
-                set(self.get_messages_from_performative(MessagePerformative.COMMIT))
-            )
-            if new_commit:
-                for mess in new_commit:
-                    item = mess.get_content()
-                    if (
-                        self.get_item_from_name(item)
-                        in self.get_preference_dict().keys()
-                    ):
-                        self.send_specific_message(mess, MessagePerformative.COMMIT)
-                        # current agent received the item
-                        self.remove_item(self.get_item_from_name(item))
-
-            # ACCEPT MESSAGE RECEIVED
-            new_accept = new_messages.intersection(
-                set(self.get_messages_from_performative(MessagePerformative.ACCEPT))
-            )
-            if new_accept:
-                for mess in new_accept:
-                    item = mess.get_content()
-                    if (
-                        self.get_item_from_name(item)
-                        in self.get_preference_dict().keys()
-                    ):
-                        self.send_specific_message(mess, MessagePerformative.COMMIT)
-                        # current agent sends the item
-                        self.remove_item(self.get_item_from_name(item))
-
-            # PROPOSE MESSAGE RECEIVED
-            new_propose = new_messages.intersection(
-                set(self.get_messages_from_performative(MessagePerformative.PROPOSE))
-            )
-            if new_propose:
-                for mess in new_propose:
-                    # in protocol, curent agent accepts directly the proposed item if it is in the 10% preferred
-                    is_in_10 = self.get_preference().is_item_among_top_10_percent(
-                        mess.get_content(), list(self.get_preference_dict().keys())
-                    )
-                    if is_in_10:
-                        self.send_specific_message(mess, MessagePerformative.ACCEPT)
-                    else:
-                        self.send_specific_message(mess, MessagePerformative.ASK_WHY)
-
-        # NO MESSAGE RECEIVED: AGENT TRIES TO PROPOSE
-        # check if the current agent has an item to propose
+        # If the agent receives no message: Send PROPOSE if possible
         elif len(self.get_item_list()) > 0:
             print("get_item_list : ",self.get_item_list)
             others = []
             for agent in self.get_model().get_agents():
                 if agent != self:
                     others.append(agent)
-            # in case of multiple other agents; other is an DiscussionAgent object
+
             other = random.choice(others)
-            print("OTHER : ",other)
+            print("other item: ",other)
             print('get_name : ',self.get_name())
             print('get_pref : ',self.get_preference())
             proposition = self.get_preference().most_preferred(self.get_item_list())
@@ -223,14 +182,8 @@ class ArgumentAgent(CommunicatingAgent):
         self.preference = pref
 
 
-    def send_specific_message(
-        self,
-        message_received,
-        performative,
-        proposition=None,
-        rebutal=False,
-        premise=None,
-    ):
+    def send_specific_message(self, message_received, performative, proposition=None, rebutal=False,   premise=None):
+
         sender = message_received.get_exp()
         content = message_received.get_content()
         # BUILDS NEXT CONTENT
@@ -242,9 +195,11 @@ class ArgumentAgent(CommunicatingAgent):
             # if in the middle of a session, have to remove unecessary heads to retrieve the Item object
             if rebutal:
                 # previous argument was an argument
-                new_content = content.split(" <- ")[0]
+                if " <- " in content:
+                    new_content = content.split(" <- ")[0]
                 # previous argument was a counter-argument
-                new_content = content.split(" , ")[0]
+                if " , " in content:
+                    new_content = content.split(" , ")[0]
                 # previous argument was a counter-argument
                 if new_content[:4] == "not ":
                     new_content = new_content[4:]
@@ -258,9 +213,8 @@ class ArgumentAgent(CommunicatingAgent):
         elif performative.__str__() == "ARGUE":
             # builds a counter-argument
             if rebutal and premise:
-                # premise are the new arguments used
                 new_content = premise
-            # builds an argument with support_proposal function
+            # builds a new argument
             else:
                 arg = self.support_proposal(content)
                 if not arg:
@@ -268,20 +222,20 @@ class ArgumentAgent(CommunicatingAgent):
                     new_content = content
                 else:
                     new_content = arg.__str__()
-        # BUILDS NEXT MESSAGE, SENDS IT AND PRINTS IT
+
+        # build and send next message
         message = Message(self.get_name(), sender, performative, new_content)
         self.send_message(message)
         self.get_model().update_step()
         print(str(self.get_model().get_step()) + " : " + message.__str__())
 
+        return
+
     def support_proposal(self, item):
         """
-        Selects one Argument object to support the selectd Item object. Method called by the agent that
-        proposes the item.
-        input:
-            item: Item object
-        output:
-            arg: Argument object (eg: "Diesel Engine <- ENVIRONMENT = BAD")
+        Used when the agent receives "ASK_WHY" after having proposed an item 
+        :param item: str - name of the item which was proposed
+        :return: string - the strongest supportive argument
         """
         arg = Argument(False, item)
         proposals = arg.List_supporting_proposal(item, self.get_preference())
@@ -307,13 +261,9 @@ class ArgumentAgent(CommunicatingAgent):
             return None
 
     def argument_parsing(self, argument_str):
-        """
-        input:
-            argument_str: string data
-        output:
-            item: Item object
-            premisces: string data
-            rebutal: bool object
+        """ 
+        :param argument: argument_str: string data
+        :return: list of [Item object, string data, bool object]
         """
         item = None
         if len(argument_str.split(" <- ")) > 1:
@@ -336,13 +286,8 @@ class ArgumentAgent(CommunicatingAgent):
 
     def update_argument(self, item, premisces, other_agent_name, rebutal):
         """
-        input :
-            item : Item
-            premisces : list of strings (with each string as Criterion.Name = Criterion.Value)
-            other_agent_name : str
-            rebutal : bool
-        output :
-            a list : [str of arguments, bool to update rebutal]
+        param :
+        output : list of [str of arguments, bool to update rebutal]
         """
         criteria = None
         value = None

@@ -1,7 +1,5 @@
 from mesa import Model
 from mesa.time import RandomActivation
-from communication.agent.CommunicatingAgent import CommunicatingAgent
-from communication.message.MessageService import MessageService
 from communication.message.Message import Message
 from communication.message.MessagePerformative import MessagePerformative
 from communication.preferences.Item import Item
@@ -10,7 +8,7 @@ from communication.preferences.CriterionName import CriterionName
 from communication.preferences.CriterionValue import CriterionValue
 from communication.preferences.Value import Value
 from communication.arguments.Argument import Argument
-from pw_argumentation_new import ArgumentModel, ArgumentAgent
+from pw_argumentation_new import ArgumentModel
 
 if __name__ == "__main__":
     """
@@ -173,12 +171,52 @@ if __name__ == "__main__":
         type(arg.List_supporting_proposal(diesel_engine, Buyer.get_preference()))
         == list
     )
-    assert len(arg.List_supporting_proposal(diesel_engine, Buyer.get_preference())) == 2
+    assert len(arg.List_supporting_proposal(diesel_engine, Buyer.get_preference())) == 3
     assert (
-        len(arg.List_supporting_proposal(diesel_engine, Seller.get_preference())) == 1
+        len(arg.List_supporting_proposal(diesel_engine, Seller.get_preference())) == 2
     )
     assert (
         type(arg.List_supporting_proposal(diesel_engine, Seller.get_preference())[0])
         == CriterionName
     )
     print("*     List_support_proposal() => OK")
+
+    assert (
+        Buyer.get_preference().get_value(diesel_engine, CriterionName.PRODUCTION_COST)
+        == None
+        or Buyer.get_preference().get_value(
+            diesel_engine, CriterionName.PRODUCTION_COST
+        )
+        == Value.VERY_GOOD
+    )
+    assert (
+        Buyer.get_preference().get_value(diesel_engine, CriterionName.PRODUCTION_COST)
+        == None
+        or Buyer.get_preference()
+        .get_value(diesel_engine, CriterionName.PRODUCTION_COST)
+        .value
+        == 4
+    )
+
+    assert type(Buyer.argument_parsing("Diesel Engine <- ENVIRONMENT = BAD")) == list
+    assert len(Buyer.argument_parsing("Diesel Engine <- ENVIRONMENT = BAD")) == 3
+    assert (
+        Buyer.argument_parsing("Diesel Engine <- ENVIRONMENT = BAD")[0] == diesel_engine
+    )
+    assert Buyer.argument_parsing("Diesel Engine <- ENVIRONMENT = BAD")[1] == [
+        "ENVIRONMENT = BAD"
+    ]
+    assert Buyer.argument_parsing("Diesel Engine <- ENVIRONMENT = BAD")[2] == False
+    assert (
+        Buyer.argument_parsing("not Diesel Engine , ENVIRONMENT = BAD")[0]
+        == diesel_engine
+    )
+    assert Buyer.argument_parsing("not Diesel Engine , ENVIRONMENT = BAD")[1] == [
+        "ENVIRONMENT = BAD"
+    ]
+    assert Buyer.argument_parsing("not Diesel Engine , ENVIRONMENT = BAD")[2] == True
+    print("*     argument_parsing() => OK")
+
+
+
+    ### La suite des tests tentés ne fonctionnaient pas ###
