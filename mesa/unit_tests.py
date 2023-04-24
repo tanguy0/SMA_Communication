@@ -5,7 +5,6 @@ from communication.message.MessagePerformative import MessagePerformative
 from communication.preferences.Item import Item
 from communication.preferences.Preferences import Preferences
 from communication.preferences.CriterionName import CriterionName
-from communication.preferences.CriterionValue import CriterionValue
 from communication.preferences.Value import Value
 from communication.arguments.Argument import Argument
 from pw_argumentation_new import ArgumentModel
